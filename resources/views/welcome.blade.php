@@ -22,7 +22,7 @@
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 </head>
 
-<body class="bg-light py-5">
+<body class="bg-light py-5" style="max-width: 400px; margin: 0 auto;">
     <div class="container">
         <h1 class="text-center mb-4">Flyman Creater</h1>
 
@@ -31,14 +31,14 @@
                 style="width: 100px;">
         </div>
 
-        <div class="d-flex justify-content-between mb-4">
+        <div class="d-flex justify-content-between mb-2">
             <button id="zoom-in" class="btn btn-primary">拡大</button>
             <button id="zoom-out" class="btn btn-primary">縮小</button>
             <button id="left_rotate" class="btn btn-primary">左回転</button>
             <button id="right_rotate" class="btn btn-primary">右回転</button>
         </div>
 
-        <div class="mb-4">
+        <div class="d-flex justify-content-between mb-4">
             <select id="flyman-selector" class="custom-select">
                 <option value="flyman.png">オリジン</option>
                 <option value="flyman_white.png">ホワイト</option>
@@ -46,7 +46,7 @@
                 <option value="flyman_blue.png">ブルー</option>
                 <option value="flyman_green.png">グリーン</option>
                 <option value="flyman_purple.png">パープル</option>
-                <option value="flyman_red.png">赤</option>
+                <option value="flyman_red.png">レッド</option>
             </select>
             <button id="reset-position" class="btn btn-danger mb-2">おっちゃんをリセット</button>
 
@@ -63,7 +63,6 @@
             <!-- Hidden Inputs -->
             <div class="custom-file mb-2">
                 <input type="file" class="custom-file-input" id="upload-image" name="background">
-                <label class="custom-file-label" for="upload-image">Choose file</label>
             </div>
             <div id="container" style="position: relative; width: 350px; height: 350px; border: 1px solid #000;">
                 <img id="uploaded-image" style="cursor: pointer; display: none;">
