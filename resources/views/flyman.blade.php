@@ -14,10 +14,12 @@
 </head>
 
 <body>
-    <div>あなたのアレが完成しました！</div>
+    <div>あなたのフライマンが完成しました。</div>
     @if ($path ?? null)
-        <img src={{ asset($path) }} alt="a">
+        <img class="animate__animated animate__backInDown" src={{ asset($path) }}>
     @endif
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
 </body>
 
 </html>

@@ -5,7 +5,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="twitter:card" content="summary_large_image">
-
     <meta property="og:title" content="Flyman">
     {{-- 以下バイネームの説明文 --}}
     <meta property="og:description" content="Flymanをレイアウト">
@@ -13,40 +12,67 @@
     {{-- ラインの画像はポジション指定可能 --}}
     <meta property="og:image:position" content="above">
 
-    <title>Flyman</title>
+    <title>Flyman Creater</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 </head>
 
-<body class="antialiased">
-    <h1>Flymans</h1>
-    <div id="container" class="justify-center items-center">
-        <img id="draggable-image" src={{ asset('image/flyman.png') }} style="cursor: pointer; width: 150px;">
+<body class="bg-light py-5">
+    <div class="container">
+        <h1 class="text-center mb-4">Flyman Creater</h1>
+
+        <div class="text-center mb-4">
+            <img id="draggable-image" src="{{ asset('image/flyman.png') }}" class="cursor-pointer"
+                style="width: 100px;">
+        </div>
+
+        <div class="d-flex justify-content-between mb-4">
+            <button id="zoom-in" class="btn btn-primary">拡大</button>
+            <button id="zoom-out" class="btn btn-primary">縮小</button>
+            <button id="left_rotate" class="btn btn-primary">左回転</button>
+            <button id="right_rotate" class="btn btn-primary">右回転</button>
+        </div>
+
+        <div class="mb-4">
+            <select id="flyman-selector" class="custom-select">
+                <option value="flyman.png">オリジン</option>
+                <option value="flyman_white.png">ホワイト</option>
+                <option value="flyman_black.png">ブラック</option>
+                <option value="flyman_blue.png">ブルー</option>
+                <option value="flyman_green.png">グリーン</option>
+                <option value="flyman_purple.png">パープル</option>
+                <option value="flyman_red.png">赤</option>
+            </select>
+            <button id="reset-position" class="btn btn-danger mb-2">おっちゃんをリセット</button>
+
+        </div>
+
+
+        <form method="POST" action="{{ route('are.create') }}" enctype="multipart/form-data" class="mb-4">
+            @csrf
+            <input type="hidden" id="xPos" name="xPos">
+            <input type="hidden" id="yPos" name="yPos">
+            <input type="hidden" id="angle" name="angle">
+            <input type="hidden" id="width" name="width">
+            <input type="hidden" id="flyman" name="flyman">
+            <!-- Hidden Inputs -->
+            <div class="custom-file mb-2">
+                <input type="file" class="custom-file-input" id="upload-image" name="background">
+                <label class="custom-file-label" for="upload-image">Choose file</label>
+            </div>
+            <div id="container" style="position: relative; width: 350px; height: 350px; border: 1px solid #000;">
+                <img id="uploaded-image" style="cursor: pointer; display: none;">
+            </div>
+            <button type="submit" id="upload-result" class="btn btn-success">作成</button>
+        </form>
+
+
     </div>
-    <button id="left_rotate">左回転</button>
-    <button id="reset-position">おじさんの位置をリセット</button>
-    <button id="right_rotate">右回転</button>
-
-
-    <form method="POST" action="{{ route('are.create') }}" enctype="multipart/form-data">
-        @csrf
-        <input type="hidden" id="xPos" name="xPos">
-        <input type="hidden" id="yPos" name="yPos">
-        <input type="hidden" id="angle" name="angle">
-
-        <input type="hidden" id="base64image" name="base64image">
-        <input type="file" id="upload-image" name="background">
-
-        <button type="submit" id="upload-result">作成</button>
-    </form>
-
-    <div id="container" style="position: relative; width: 500px; height: 500px; border: 1px solid #000;">
-        <img id="uploaded-image" style="cursor: pointer; display: none;">
-    </div>
-
 
 
 
@@ -71,6 +97,7 @@
         let angle = 0;
         let xPos = 0;
         let yPos = 0;
+        let width = 100;
 
         $(function() {
             $("#draggable-image").draggable({
@@ -100,12 +127,7 @@
                     }
                 }
             });
-            $("#draggable-image").rotatable({
-                stop: function(event, ui) {
-                    angle = ui.angle.current;
-                    console.log('角度:', angle);
-                }
-            });
+
             // リセットボタンがクリックされたときの処理
             $("#reset-position").click(function() {
                 $("#draggable-image").css({
@@ -115,9 +137,21 @@
                 xPos = 0;
                 yPos = 0;
                 angle = 0;
+                width = 100;
+                $('#draggable-image').css('width', width);
+                document.getElementById('draggable-image').src = '/image/' + 'flyman.png';
             });
         });
         $(document).ready(function() {
+            $('#zoom-in').click(function() {
+                width += 10;
+                $('#draggable-image').css('width', width);
+            });
+
+            $('#zoom-out').click(function() {
+                width -= 10;
+                $('#draggable-image').css('width', width);
+            });
             $('#right_rotate').click(function() {
                 angle += 15;
                 $('#draggable-image').css({
@@ -133,12 +167,18 @@
                 console.log(angle);
             });
         });
+        document.getElementById('flyman-selector').addEventListener('change', function() {
+            const selectedImage = this.value ?? flyman.png;
+            document.getElementById('draggable-image').src = '/image/' + selectedImage;
+        });
     </script>
     <script>
         $('#upload-result').on('click', function() {
             $('#xPos').val(xPos);
             $('#yPos').val(yPos);
             $('#angle').val(angle);
+            $('#width').val(width);
+            $('#flyman').val($('#flyman-selector').val());
         });
     </script>
     <script>
@@ -153,8 +193,8 @@
                         const img = new Image();
 
                         img.onload = function() {
-                            const maxWidth = 500; // コンテナの幅
-                            const maxHeight = 500; // コンテナの高さ
+                            const maxWidth = 350; // コンテナの幅
+                            const maxHeight = 350; // コンテナの高さ
                             let width = img.width;
                             let height = img.height;
 

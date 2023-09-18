@@ -14,9 +14,11 @@ class AreCreateController extends Controller
         $xPos = floor($request->input('xPos'));
         $yPos = floor($request->input('yPos'));
         $angle = floor($request->input('angle'));
+        $width = $request->input('width');
+        $flyman = $request->input('flyman');
         $image = Image::make($request->background);
-        $maxWidth = 500;
-        $maxHeight = 500;
+        $maxWidth = 350;
+        $maxHeight = 350;
 
         // 画像の現在の幅と高さを取得
         $currentWidth = $image->width();
@@ -29,9 +31,10 @@ class AreCreateController extends Controller
                 $constraint->upsize(); // このオプションで、元のサイズよりも小さくならないようにする
             });
         }
-        $insertImage = Image::make(public_path('image/flyman.png'));
+        $flyman_path = 'image/' . $flyman;
+        $insertImage = Image::make(public_path($flyman_path));
         // width 100px, height 100px にリサイズ
-        $insertImage->resize(150, 150, function ($constraint) {
+        $insertImage->resize($width, null, function ($constraint) {
             $constraint->aspectRatio();
             $constraint->upsize(); // このオプションで、元のサイズよりも小さくならないようにする
         });
