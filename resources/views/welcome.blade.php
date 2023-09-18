@@ -4,8 +4,16 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="twitter:card" content="summary_large_image">
 
-    <title>Laravel</title>
+    <meta property="og:title" content="Flyman">
+    {{-- 以下バイネームの説明文 --}}
+    <meta property="og:description" content="Flymanをレイアウト">
+    <meta property="og:image" content="{{ asset('image/flyman.png') ?? null }}">
+    {{-- ラインの画像はポジション指定可能 --}}
+    <meta property="og:image:position" content="above">
+
+    <title>Flyman</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
