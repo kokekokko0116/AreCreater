@@ -43,7 +43,11 @@ class AreCreateController extends Controller
 
         // 画像を保存
         $unique = uniqid();
-        $image->save(public_path('flymans/' . $unique . '.png'));
+        $image->save(
+            public_path('flymans/' . $unique . '.png'),
+            100,
+            'png'
+        );
 
         //保存された画像のパス
         $path = 'flymans/' . $unique . '.png';
