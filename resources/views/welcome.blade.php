@@ -9,7 +9,7 @@
     <meta property="og:title" content="Flyman">
     {{-- 以下バイネームの説明文 --}}
     <meta property="og:description" content="Flymanをレイアウト">
-    <meta property="og:image" content={{ asset('image/flyman.png') ?? null }}>
+    <meta property="og:image" content={{ asset('image/80233.jpg') ?? null }}>
     {{-- ラインの画像はポジション指定可能 --}}
     <meta property="og:image:position" content="above">
 
