@@ -14,30 +14,33 @@
 </head>
 
 <body class="antialiased">
-    <h1>Photo upload / 写真登録</h1>
-    <div id="container" style="">
-        <img id="draggable-image" src={{ asset('image/flyman.png') }} style="cursor: pointer; width: 100px;">
+    <h1>Flymans</h1>
+    <div id="container" class="justify-center items-center">
+        <img id="draggable-image" src={{ asset('image/flyman.png') }} style="cursor: pointer; width: 150px;">
     </div>
-    <button id="right_rotate">右回転</button>
     <button id="left_rotate">左回転</button>
     <button id="reset-position">おじさんの位置をリセット</button>
+    <button id="right_rotate">右回転</button>
+
 
     <form method="POST" action="{{ route('are.create') }}" enctype="multipart/form-data">
         @csrf
         <input type="hidden" id="xPos" name="xPos">
         <input type="hidden" id="yPos" name="yPos">
         <input type="hidden" id="angle" name="angle">
-        <div>
-            <label for="formFileSm">こちらからアップロードしてください。</label>
-        </div>
-        <input type="file" id="upload">
 
-
-
-        <div id="upload-demo"></div>
         <input type="hidden" id="base64image" name="base64image">
+        <input type="file" id="upload-image" name="background">
+
         <button type="submit" id="upload-result">作成</button>
     </form>
+
+    <div id="container" style="position: relative; width: 500px; height: 500px; border: 1px solid #000;">
+        <img id="uploaded-image" style="cursor: pointer; display: none;">
+    </div>
+
+
+
 
 
     <!-- jQuery library -->
@@ -47,21 +50,12 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="https://rawgit.com/godswearhats/jquery-ui-rotatable/master/jquery.ui.rotatable.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
 
-
-    {{-- croppie --}}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.js"></script>
 
     <style>
         #draggable-image {
             z-index: 9999;
-        }
-
-
-        #upload-demo {
-            width: 300px;
-            height: 300px;
         }
     </style>
     <script>
@@ -72,13 +66,13 @@
 
         $(function() {
             $("#draggable-image").draggable({
-                containment: "#upload-demo",
+                containment: "#uploaded-image",
                 // uploaddemo内での座標を取得
 
                 stop: function(event, ui) {
-                    var uploadDemo = $("#upload-demo").offset();
-                    var uploadDemoWidth = $("#upload-demo").width();
-                    var uploadDemoHeight = $("#upload-demo").height();
+                    var uploadDemo = $("#uploaded-image").offset();
+                    var uploadDemoWidth = $("#uploaded-image").width();
+                    var uploadDemoHeight = $("#uploaded-image").height();
 
                     var imagePos = ui.offset;
                     var imageWidth = $(this).width();
@@ -121,60 +115,66 @@
                 $('#draggable-image').css({
                     'transform': 'rotate(' + angle + 'deg)'
                 });
+                console.log(angle);
             });
             $('#left_rotate').click(function() {
                 angle -= 15;
                 $('#draggable-image').css({
                     'transform': 'rotate(' + angle + 'deg)'
                 });
+                console.log(angle);
             });
         });
     </script>
     <script>
+        $('#upload-result').on('click', function() {
+            $('#xPos').val(xPos);
+            $('#yPos').val(yPos);
+            $('#angle').val(angle);
+        });
+    </script>
+    <script>
         $(document).ready(function() {
-            var $uploadCrop;
+            $("#upload-image").change(function(e) {
+                const file = e.target.files[0];
 
-            function readFile(input) {
-                if (input.files && input.files[0]) {
-                    var reader = new FileReader();
+                if (file) {
+                    const reader = new FileReader();
 
-                    reader.onload = function(e) {
-                        $uploadCrop.croppie('bind', {
-                            url: e.target.result
-                        });
+                    reader.onload = function(event) {
+                        const img = new Image();
+
+                        img.onload = function() {
+                            const maxWidth = 500; // コンテナの幅
+                            const maxHeight = 500; // コンテナの高さ
+                            let width = img.width;
+                            let height = img.height;
+
+                            if (width > maxWidth) {
+                                const ratio = maxWidth / width;
+                                width = maxWidth;
+                                height *= ratio;
+                            }
+
+                            if (height > maxHeight) {
+                                const ratio = maxHeight / height;
+                                height = maxHeight;
+                                width *= ratio;
+                            }
+
+                            $("#uploaded-image").css({
+                                width: width + "px",
+                                height: height + "px"
+                            }).attr('src', event.target.result).show();
+
+                            // draggableはここで適用せず、単に画像を表示するだけ
+                        }
+
+                        img.src = event.target.result;
                     }
 
-                    reader.readAsDataURL(input.files[0]);
+                    reader.readAsDataURL(file);
                 }
-            }
-
-            $uploadCrop = $('#upload-demo').croppie({
-                enableExif: true,
-                viewport: {
-                    width: 250,
-                    height: 250,
-                    type: 'square'
-                },
-                boundary: {
-                    width: 300,
-                    height: 300
-                }
-            });
-
-            $('#upload').on('change', function() {
-                readFile(this);
-            });
-            $('#upload-result').on('click', function() {
-                $uploadCrop.croppie('result', {
-                    type: 'canvas',
-                    size: 'viewport',
-                    quality: 1
-                }).then(function(resp) {
-                    $('#base64image').val(resp);
-                });
-                $('#xPos').val(xPos);
-                $('#yPos').val(yPos);
-                $('#angle').val(angle);
             });
         });
     </script>

@@ -10,42 +10,43 @@ class AreCreateController extends Controller
 {
     public function are_create(Request $request)
     {
-        // 小数点切り捨て
+        // 小数点切り捨て ~~.0も切り捨て
         $xPos = floor($request->input('xPos'));
         $yPos = floor($request->input('yPos'));
         $angle = floor($request->input('angle'));
-        // base64エンコードされた画像データを取得
-        $image_data = $request->input('base64image');
-        // base64データをデコード
-        $image_parts = explode(";base64,", $image_data);
-        // イメージタイプを取得
-        $image_type_aux = explode("image/", $image_parts[0]);
-        $image_type = $image_type_aux[1];
-        $image_base64 = base64_decode($image_parts[1]);
+        $image = Image::make($request->background);
+        $maxWidth = 500;
+        $maxHeight = 500;
 
-        // 一時的なファイルを作成
-        $tmp_file = tempnam(sys_get_temp_dir(), 'base64img');
-        file_put_contents($tmp_file, $image_base64);
+        // 画像の現在の幅と高さを取得
+        $currentWidth = $image->width();
+        $currentHeight = $image->height();
 
-        // 一時的なファイルをUploadedFileインスタンスとして扱い、Laravelのバリデーションやファイル処理機能を利用
-        $file = new \Illuminate\Http\UploadedFile($tmp_file, uniqid() . '.' . $image_type, 'image/png', null, true);
-        $template = Image::make($file);
-
+        // 縦または横のいずれかが指定した値を超える場合の処理
+        if ($currentWidth > $maxWidth || $currentHeight > $maxHeight) {
+            $image->resize($maxWidth, $maxHeight, function ($constraint) {
+                $constraint->aspectRatio();
+                $constraint->upsize(); // このオプションで、元のサイズよりも小さくならないようにする
+            });
+        }
         $insertImage = Image::make(public_path('image/flyman.png'));
+        // width 100px, height 100px にリサイズ
+        $insertImage->resize(150, 150, function ($constraint) {
+            $constraint->aspectRatio();
+            $constraint->upsize(); // このオプションで、元のサイズよりも小さくならないようにする
+        });
+        $angle = $angle * -1;
         $insertImage->rotate($angle);
 
         // 画像を合成 angleは回転角度
-        $template->insert($insertImage, 'top-left', $xPos, $yPos);
+        $image->insert($insertImage, 'top-left', $xPos, $yPos);
 
         // 画像を保存
         $unique = uniqid();
-        $template->save(public_path('flymans/' . $unique . '.png'));
+        $image->save(public_path('flymans/' . $unique . '.png'));
 
         //保存された画像のパス
         $path = 'flymans/' . $unique . '.png';
-
-        // 使いおわったtmpファイルを削除する処理
-        unlink($tmp_file);
 
         return view('flyman', compact('path'));
     }
