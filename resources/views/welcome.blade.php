@@ -167,8 +167,9 @@
             });
         });
         document.getElementById('flyman-selector').addEventListener('change', function() {
-            const selectedImage = this.value ?? flyman.png;
-            document.getElementById('draggable-image').src = '/image/' + selectedImage;
+            const selectedImage = this.value || 'flyman.png';
+            const basePath = '{{ asset('image/') }}';
+            document.getElementById('draggable-image').src = basePath + '/' + selectedImage;
         });
     </script>
     <script>
