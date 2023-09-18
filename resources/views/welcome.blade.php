@@ -70,6 +70,16 @@
             <button type="submit" id="upload-result" class="btn btn-success">作成</button>
         </form>
 
+        <div class="container mt-2">
+            <h6 class="mb-2">Flyman Creater 使い方</h6>
+            <div>
+                <div class="border-bottom py-1">1. 背景写真の選択</div>
+                <div class="border-bottom py-1">2. おっちゃんを配置（ドラッグ&ドロップ）</div>
+                <div class="border-bottom py-1">3. 作成ボタンを押す</div>
+            </div>
+        </div>
+
+
 
     </div>
 
