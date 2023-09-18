@@ -138,7 +138,8 @@
                 angle = 0;
                 width = 100;
                 $('#draggable-image').css('width', width);
-                document.getElementById('draggable-image').src = '/image/' + 'flyman.png';
+                const basePath = '{{ asset('image/flyman.png') }}';
+                document.getElementById('draggable-image').src = basePath;
             });
         });
         $(document).ready(function() {
